@@ -67,31 +67,43 @@ class MNISTGANModel(LightningModule):
         loss = None
 
         # TODO: Create adversarial ground truths
-
+        valid = torch.ones((batch_size, 1), requires_grad=False, device=self.device)
+        fake = torch.zeros((batch_size, 1), requires_grad=False, device=self.device)
         # TODO: Create noise and labels for generator input
+        z = torch.randn((batch_size, self.hparams.latent_dim), device=self.device)
+        gen_labels = torch.randint(0, self.hparams.n_classes, (batch_size,), device=self.device)
 
         if optimizer_idx == 0 or not self.training:
             # TODO: generate images and calculate the adversarial loss for the generator
             # HINT: when optimizer_idx == 0 the model is optimizing the generator
-            raise NotImplementedError
+            # raise NotImplementedError
 
             # TODO: Generate a batch of images
-
+            gen_imgs = self.generator(z, gen_labels)
+            
             # TODO: Calculate loss to measure generator's ability to fool the discriminator
-
+            validity = self.discriminator(gen_imgs, gen_labels)
+            loss = self.adversarial_loss(validity, valid)
+            log_dict["g_loss"] = loss
+            
         if optimizer_idx == 1 or not self.training:
             # TODO: generate images and calculate the adversarial loss for the discriminator
             # HINT: when optimizer_idx == 1 the model is optimizing the discriminator
-            raise NotImplementedError
+            # raise NotImplementedError
 
             # TODO: Generate a batch of images
-
+            gen_imgs = self.generator(z, gen_labels).detach()
             # TODO: Calculate loss for real images
-
+            real_pred = self.discriminator(imgs, labels)
+            real_loss = self.adversarial_loss(real_pred, valid)
             # TODO: Calculate loss for fake images
-
+            fake_pred = self.discriminator(gen_imgs, gen_labels)
+            fake_loss = self.adversarial_loss(fake_pred, fake)
             # TODO: Calculate total discriminator loss
-
+            loss = (real_loss + fake_loss) / 2
+            log_dict["d_loss"] = loss
+            log_dict["d_real_loss"] = real_loss
+            log_dict["d_fake_loss"] = fake_loss
         return log_dict, loss
 
     def on_epoch_end(self):
@@ -99,9 +111,21 @@ class MNISTGANModel(LightningModule):
         #     : at the end of each epoch
 
         # TODO: Create fake images
-
+        self.eval()
+        with torch.no_grad():
+            # Generate images for visualization
+            num_samples = 64  # Generate a grid of images
+            z = torch.randn((num_samples, self.hparams.latent_dim), device=self.device)
+            gen_labels = torch.randint(0, self.hparams.n_classes, (num_samples,), device=self.device)
+            gen_imgs = self.generator(z, gen_labels)
+            gen_imgs = gen_imgs.cpu()
+        
+        self.train()
+        
         for logger in self.trainer.logger:
             if type(logger).__name__ == "WandbLogger":
                 # TODO: log fake images to wandb (https://docs.wandb.ai/guides/track/log/media)
                 #     : replace `None` with your wandb Image object
-                logger.experiment.log({"gen_imgs": None})
+                wandb_images = [wandb.Image(img, caption=f"Label: {label}") 
+                                for img, label in zip(gen_imgs, gen_labels.cpu())]
+                logger.experiment.log({"gen_imgs": wandb_images})

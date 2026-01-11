@@ -1,0 +1,3 @@
+- experiment=train_mnist_gan.yaml
+- trainer.max_epochs=20
+- datamodule.batch_size=32

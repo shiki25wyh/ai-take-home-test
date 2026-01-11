@@ -1,0 +1,39 @@
+{
+  "os": "macOS-15.7.4-arm64-arm-64bit",
+  "python": "CPython 3.8.20",
+  "startedAt": "2026-01-11T06:10:24.720507Z",
+  "args": [
+    "experiment=train_mnist_gan.yaml",
+    "trainer.max_epochs=20",
+    "datamodule.batch_size=32"
+  ],
+  "program": "run.py",
+  "git": {
+    "remote": "https://github.com/pantheon-lab-public/ai-take-home-test.git",
+    "commit": "c15109c0f48ed5b0a23b8955356715b4d98eccc4"
+  },
+  "email": "jaimeyhwang@gmail.com",
+  "root": ".",
+  "host": "Jaimes-MacBook-Pro.local",
+  "executable": "/Users/shiki/opt/anaconda3/envs/pantheon-py38/bin/python",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "396694745088"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "apple": {
+    "name": "Apple M1",
+    "ecpuCores": 4,
+    "pcpuCores": 4,
+    "gpuCores": 8,
+    "memoryGb": 16,
+    "ramTotalBytes": "17179869184"
+  },
+  "writerId": "wloao4a3kq69agsm6vahk5imkb7sr808"
+}
